@@ -15,6 +15,7 @@ import org.jivesoftware.smack.packet.{IQ, Packet}
 import org.jivesoftware.smack.filter.PacketFilter
 import org.jivesoftware.smack.util.StringUtils
 import org.jivesoftware.smackx.pubsub._
+import org.jivesoftware.smack.XMPPException //Added By Jabbari
 
 /** this class processes the packets that are prefixed with
  * Appliance in ir.xamin.packet.receive
@@ -152,7 +153,7 @@ class ApplianceProcessor(redisClient: RedisClient, xmppConnection: XMPPConnectio
     // gonna be used to find out if we've saved any version of appliance or not
     val isNew = !redis.exists(key)
     val versionIndexKey = "appliance_version_to_index:"+appliance.name+":"+appliance.version
-    val len = redis.llen(key).get.toInt
+    val len = redis.llen(key).get.toInt //Number of records with the appliance name as key
     // we gonna update existing index if we already have the version
     var versionRightIndex = -1
     if(redis.exists(versionIndexKey)) {
@@ -179,7 +180,30 @@ class ApplianceProcessor(redisClient: RedisClient, xmppConnection: XMPPConnectio
       form.setNotifyRetract(true)
       form.setPersistentItems(true)
       form.setPublishModel(PublishModel.open)
-      val leaf = manager.createNode(set.getName, form)
+
+	//println("Appliance Name : " + set.getName) //Jabbari Test
+	//println("xmppServiceName : "+ xmpp.getServiceName) //Jabbari Test
+    //Added by Jabbari : 
+	try{
+            try{
+            	val existingNode = manager.getNode(set.getName)
+            	//exists, so delete
+                // println("Node Exists, We're going to delete it.")
+            	manager.deleteNode(set.getName)
+            }
+            //catch
+        	//'getNode' threw an exception.
+        	//so we know that the node did not exist
+            
+            val leaf = manager.createNode(set.getName, form)
+    	}
+    	catch{
+        	case e: XMPPException => System.err.println(e)
+    	}
+    //End. Added by Jabbari
+	
+        // val leaf = manager.createNode(set.getName, form) //Moved by Jabbari
+	
     } else {
       val node = manager.getNode(set.getName)
       node match {

@@ -47,7 +47,7 @@ object Appliance extends DefaultProtocol {
         } catch {
           case e:Exception => {
             Console.err.println(m)
-            throw new RuntimeException("Invalid Appliance json")
+            throw new RuntimeException("aLaa:Invalid Appliance json")
           }
         }
       }
