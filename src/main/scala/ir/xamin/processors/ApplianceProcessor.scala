@@ -184,22 +184,19 @@ class ApplianceProcessor(redisClient: RedisClient, xmppConnection: XMPPConnectio
 	//println("Appliance Name : " + set.getName) //Jabbari Test
 	//println("xmppServiceName : "+ xmpp.getServiceName) //Jabbari Test
     //Added by Jabbari : 
-	try{
-            try{
+    try{            
             	val existingNode = manager.getNode(set.getName)
             	//exists, so delete
-                // println("Node Exists, We're going to delete it.")
+                //println("Node Exists in PubSubManager, We're going to delete it and recreate it. This might be because you have deleted records from Redis")
             	manager.deleteNode(set.getName)
-            }
-            //catch
-        	//'getNode' threw an exception.
-        	//so we know that the node did not exist
-            
-            val leaf = manager.createNode(set.getName, form)
     	}
     	catch{
-        	case e: XMPPException => System.err.println(e)
+	     //'getNode' threw an exception.
+             //so we know that the node did not exist
+            case e: XMPPException =>  //Do nothing System.err.println(e)
     	}
+
+	val leaf = manager.createNode(set.getName, form)
     //End. Added by Jabbari
 	
         // val leaf = manager.createNode(set.getName, form) //Moved by Jabbari
